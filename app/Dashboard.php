@@ -1,0 +1,1 @@
+<?php class Dashboard{ function index(){ echo '<h2>Dashboard</h2><a href="evals">Evaluaciones</a>'; } }
