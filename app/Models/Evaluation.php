@@ -74,9 +74,10 @@ class Evaluation {
     }
 
     public function addQuestion($evaluationId, $data) {
-        $stmt = $this->db->prepare("INSERT INTO questions (evaluation_id, question_text, type, options) VALUES (?, ?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO questions (evaluation_id, question_text, type, options, note) VALUES (?, ?, ?, ?, ?)");
         $options = isset($data['options']) ? json_encode($data['options']) : null;
-        $stmt->execute([$evaluationId, $data['question_text'], $data['type'], $options]);
+        $note = isset($data['note']) ? $data['note'] : null;
+        $stmt->execute([$evaluationId, $data['question_text'], $data['type'], $options, $note]);
         return $this->db->lastInsertId();
     }
 
@@ -101,7 +102,13 @@ class Evaluation {
     }
 
     public function getAssignedUsers($evaluationId) {
-        $stmt = $this->db->prepare("SELECT u.id, u.username, u.email FROM users u JOIN assignments a ON u.id = a.user_id WHERE a.evaluation_id = ?");
+        $stmt = $this->db->prepare("SELECT u.id, u.username, u.nombre FROM users u JOIN assignments a ON u.id = a.user_id WHERE a.evaluation_id = ?");
+        $stmt->execute([$evaluationId]);
+        return $stmt->fetchAll();
+    }
+
+    public function getAssignedUsersWithStatus($evaluationId) {
+        $stmt = $this->db->prepare("SELECT u.id, u.username, u.nombre, a.id AS assignment_id, EXISTS(SELECT 1 FROM responses r WHERE r.assignment_id = a.id) AS completed FROM users u JOIN assignments a ON u.id = a.user_id WHERE a.evaluation_id = ? ORDER BY u.nombre");
         $stmt->execute([$evaluationId]);
         return $stmt->fetchAll();
     }

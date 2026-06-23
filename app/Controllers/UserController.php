@@ -10,7 +10,12 @@ class UserController extends BaseController {
     }
 
     public function index() {
-        $users = $this->userModel->getAll();
+        $filters = [
+            'cedula' => trim($_GET['cedula'] ?? ''),
+            'cef' => trim($_GET['cef'] ?? ''),
+        ];
+
+        $users = $this->userModel->getAll($filters);
         require_once BASE_PATH . '/views/admin/users.php';
     }
 
@@ -21,23 +26,24 @@ class UserController extends BaseController {
         }
 
         $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $cef = trim($_POST['cef'] ?? '');
+        $nombre = trim($_POST['nombre'] ?? '');
+        $cargo = trim($_POST['cargo'] ?? '');
+        $grupo = trim($_POST['grupo'] ?? '');
         $password = $_POST['password'] ?? '';
         $role = $_POST['role'] ?? 'user';
 
-        if (empty($username) || empty($email) || empty($password)) {
-            $_SESSION['error'] = 'All fields are required.';
-            $this->redirect('/users/create');
-        }
-
-        if ($this->userModel->findByEmail($email)) {
-            $_SESSION['error'] = 'Email already exists.';
+        if (empty($username) || empty($password)) {
+            $_SESSION['error'] = 'Username and password are required.';
             $this->redirect('/users/create');
         }
 
         $this->userModel->create([
             'username' => $username,
-            'email' => $email,
+            'cef' => $cef,
+            'nombre' => $nombre,
+            'cargo' => $cargo,
+            'grupo' => $grupo,
             'password' => $password,
             'role' => $role
         ]);
@@ -59,20 +65,34 @@ class UserController extends BaseController {
         }
 
         $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $cef = trim($_POST['cef'] ?? '');
+        $nombre = trim($_POST['nombre'] ?? '');
+        $cargo = trim($_POST['cargo'] ?? '');
+        $grupo = trim($_POST['grupo'] ?? '');
         $password = $_POST['password'] ?? '';
         $role = $_POST['role'] ?? 'user';
 
-        if (empty($username) || empty($email)) {
-            $_SESSION['error'] = 'Username and email are required.';
+        if (empty($username)) {
+            $_SESSION['error'] = 'Username is required.';
             $this->redirect('/users/' . $id . '/edit');
         }
 
         $data = [
             'username' => $username,
-            'email' => $email,
             'role' => $role
         ];
+        if (!empty($cef)) {
+            $data['cef'] = $cef;
+        }
+        if (!empty($nombre)) {
+            $data['nombre'] = $nombre;
+        }
+        if (!empty($cargo)) {
+            $data['cargo'] = $cargo;
+        }
+        if (!empty($grupo)) {
+            $data['grupo'] = $grupo;
+        }
         if (!empty($password)) {
             $data['password'] = $password;
         }
@@ -132,8 +152,9 @@ class UserController extends BaseController {
             }
 
             $header = array_map('strtolower', array_map('trim', $header));
+/* 
             $requiredColumns = ['username', 'email', 'password'];
-/*      
+     
             // Check required columns
             foreach ($requiredColumns as $col) {
                 if (!in_array($col, $header)) {
@@ -189,7 +210,6 @@ class UserController extends BaseController {
                     'nombre' => $userData['nombre'],
                     'cargo' => $userData['cargo'],
                     'grupo' => $userData['grupo'],
-                    'email' => $userData['email'],
                     'role' => $role
                 ]);
 

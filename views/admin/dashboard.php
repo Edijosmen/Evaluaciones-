@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Evaluation System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: 700;
+        }
+        .card-header h5 {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+        }
+        .search-input-group .form-control {
+            min-width: 240px;
+        }
+        .badge.bg-warning {
+            color: #212529;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -18,66 +38,77 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <h1>Admin Dashboard</h1>
+    <div class="container mt-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">Panel de administración</h1>
+                <p class="text-muted">Supervisa evaluaciones, usuarios y accesos desde un solo lugar.</p>
+            </div>
+            <div class="text-md-end">
+                <a href="evaluations/create" class="btn btn-primary me-2">Nueva evaluación</a>
+                <a href="users/create" class="btn btn-outline-secondary">Nuevo usuario</a>
+            </div>
+        </div>
+
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         <?php endif; ?>
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         <?php endif; ?>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Users</h5>
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <div>
+                        <h2 class="h5 mb-1">Evaluaciones recientes</h2>
+                        <p class="text-muted mb-0">Accede rápidamente a las evaluaciones más recientes.</p>
                     </div>
-                    <div class="card-body">
-                        <p>Manage system users.</p>
-                        <a href="users" class="btn btn-primary">View Users</a>
-                        <a href="users/create" class="btn btn-secondary">Create User</a>
-                        <button type="button" class="btn btn-info mt-2" data-bs-toggle="modal" data-bs-target="#bulkUploadModal">Bulk Upload Users</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Evaluations</h5>
-                    </div>
-                    <div class="card-body">
-                        <p>Manage evaluations and questions.</p>
-                        <a href="evaluations" class="btn btn-primary">View Evaluations</a>
-                        <a href="evaluations/create" class="btn btn-secondary">Create Evaluation</a>
+                    <div class="input-group" style="max-width: 320px;">
+                        <span class="input-group-text">Buscar</span>
+                        <input id="dashboardSearch" type="search" class="form-control" placeholder="Buscar título..." />
                     </div>
                 </div>
             </div>
         </div>
 
-        <h2 class="mt-4">Recent Evaluations</h2>
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-hover align-middle" id="evaluationsTable">
+                <thead class="table-light">
                     <tr>
-                        <th>Title</th>
-                        <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Actions</th>
+                        <th>Título</th>
+                        <th>Estado</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($evaluations as $eval): ?>
-                        <tr>
+                        <tr class="evaluation-row">
                             <td><?php echo htmlspecialchars($eval['title']); ?></td>
-                            <td><?php echo ucfirst($eval['status']); ?></td>
+                            <td>
+                                <?php
+                                    $badgeClass = 'secondary';
+                                    if ($eval['status'] === 'published') $badgeClass = 'success';
+                                    if ($eval['status'] === 'closed') $badgeClass = 'dark';
+                                    if ($eval['status'] === 'draft') $badgeClass = 'warning';
+                                ?>
+                                <span class="badge bg-<?php echo $badgeClass; ?> text-capitalize"><?php echo htmlspecialchars($eval['status']); ?></span>
+                            </td>
                             <td><?php echo $eval['start_date']; ?></td>
                             <td><?php echo $eval['end_date']; ?></td>
-                            <td>
-                                <a href="evaluations/<?php echo $eval['id']; ?>" class="btn btn-sm btn-info">View</a>
-                                <a href="evaluations/<?php echo $eval['id']; ?>/edit" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="evaluations/<?php echo $eval['id']; ?>/assign" class="btn btn-sm btn-success">Assign</a>
+                            <td class="text-end">
+                                <a href="evaluations/<?php echo $eval['id']; ?>" class="btn btn-sm btn-outline-info me-1">Ver</a>
+                                <a href="evaluations/<?php echo $eval['id']; ?>/edit" class="btn btn-sm btn-outline-warning me-1">Editar</a>
+                                <a href="evaluations/<?php echo $eval['id']; ?>/assign" class="btn btn-sm btn-outline-success me-1">Asignar</a>
+                                <a href="evaluations/<?php echo $eval['id']; ?>/download" class="btn btn-sm btn-outline-secondary">Descargar CSV</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -85,6 +116,8 @@
             </table>
         </div>
     </div>
+
+    <!-- Bulk Upload Modal -->
 
     <!-- Bulk Upload Modal -->
     <div class="modal fade" id="bulkUploadModal" tabindex="-1" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
@@ -120,6 +153,15 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById('dashboardSearch')?.addEventListener('input', function(event) {
+            const query = event.target.value.toLowerCase();
+            document.querySelectorAll('.evaluation-row').forEach(function(row) {
+                const title = row.querySelector('td:first-child').textContent.toLowerCase();
+                row.style.display = title.includes(query) ? '' : 'none';
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

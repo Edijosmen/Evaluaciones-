@@ -38,7 +38,10 @@ class EvaluationController extends BaseController {
         $user = $_SESSION['user'];
 
         if ($user['role'] === 'admin') {
-            $responses = $this->responseModel->getForEvaluation($id);
+            $assignedUsers = $this->evaluationModel->getAssignedUsersWithStatus($id);
+            $totalAssigned = count($assignedUsers);
+            $completedCount = count(array_filter($assignedUsers, fn($u) => $u['completed']));
+            $pendingUsers = array_values(array_filter($assignedUsers, fn($u) => !$u['completed']));
             require_once BASE_PATH . '/views/admin/evaluation_detail.php';
         } else {
             // Check if assigned
@@ -55,6 +58,45 @@ class EvaluationController extends BaseController {
             }
             require_once BASE_PATH . '/views/user/evaluation_form.php';
         }
+    }
+
+    public function downloadResponses($id) {
+        $evaluation = $this->evaluationModel->findById($id);
+        if (!$evaluation) {
+            $_SESSION['error'] = 'Evaluation not found.';
+            $this->redirect('/evaluations');
+        }
+
+        $responses = $this->responseModel->getForEvaluation($id);
+        $filename = 'evaluation_' . $id . '_responses_' . date('Ymd_His') . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'w');
+        // Write UTF-8 BOM so Excel and other programs correctly interpret accented characters
+        fwrite($output, "\xEF\xBB\xBF");
+        fputcsv($output, ['Evaluation ID', 'Title', 'User ID', 'Username', 'Nombre', 'Question ID', 'Question', 'Question Type', 'Answer', 'Responded At']);
+
+        foreach ($responses as $row) {
+            fputcsv($output, [
+                $id,
+                $evaluation['title'],
+                $row['user_id'] ?? '',
+                $row['username'] ?? '',
+                $row['full_name'] ?? '',
+                $row['question_id'] ?? '',
+                $row['question_text'] ?? '',
+                $row['type'] ?? '',
+                $row['answer'] ?? '',
+                $row['responded_at'] ?? ''
+            ]);
+        }
+
+        fclose($output);
+        exit;
     }
 
     public function create() {
@@ -162,10 +204,13 @@ class EvaluationController extends BaseController {
             $this->redirect('/evaluations/' . $id);
         }
 
+        $note = trim($_POST['note'] ?? '');
+
         $this->evaluationModel->addQuestion($id, [
             'question_text' => $questionText,
             'type' => $type,
-            'options' => $options
+            'options' => $options,
+            'note' => $note ?: null
         ]);
 
         $_SESSION['success'] = 'Question added successfully.';
@@ -175,7 +220,7 @@ class EvaluationController extends BaseController {
     public function assign($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $evaluation = $this->evaluationModel->findById($id);
-            $users = $this->userModel->getAll();
+            $users = $this->userModel->getAll([]); // Sin filtros para mostrar todos los usuarios
             $assignedUsers = $this->evaluationModel->getAssignedUsers($id);
             require_once BASE_PATH . '/views/admin/evaluation_assign.php';
             return;

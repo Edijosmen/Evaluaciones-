@@ -26,12 +26,24 @@
 
         <form method="POST" action="users/create">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
+                <label for="username" class="form-label">Username (Cédula)</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <label for="cef" class="form-label">CEF</label>
+                <input type="text" class="form-control" id="cef" name="cef">
+            </div>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre">
+            </div>
+            <div class="mb-3">
+                <label for="cargo" class="form-label">Cargo</label>
+                <input type="text" class="form-control" id="cargo" name="cargo">
+            </div>
+            <div class="mb-3">
+                <label for="grupo" class="form-label">Grupo</label>
+                <input type="text" class="form-control" id="grupo" name="grupo">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>

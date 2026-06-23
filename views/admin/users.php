@@ -23,6 +23,22 @@
             <h1>Users</h1>
             <a href="users/create" class="btn btn-primary">Create User</a>
         </div>
+
+        <form method="GET" class="row g-3 my-3">
+            <div class="col-md-4">
+                <label for="cedula" class="form-label">Filtrar por Cédula</label>
+                <input type="text" id="cedula" name="cedula" class="form-control" value="<?php echo htmlspecialchars($filters['cedula'] ?? ''); ?>">
+            </div>
+            <div class="col-md-4">
+                <label for="cef" class="form-label">Filtrar por CEF</label>
+                <input type="text" id="cef" name="cef" class="form-control" value="<?php echo htmlspecialchars($filters['cef'] ?? ''); ?>">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Buscar</button>
+                <a href="users" class="btn btn-secondary">Limpiar</a>
+            </div>
+        </form>
+
         <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
         <?php endif; ?>
@@ -36,6 +52,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Cedula</th>
+                        <th>CEF</th>
                         <th>Nombre</th>
                         <th>Role</th>
                         <th>Created At</th>
@@ -47,6 +64,7 @@
                         <tr>
                             <td><?php echo $user['id']; ?></td>
                             <td><?php echo htmlspecialchars($user['username']); ?></td>
+                            <td><?php echo htmlspecialchars($user['cef'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($user['nombre']); ?></td>
                             <td><?php echo ucfirst($user['role']); ?></td>
                             <td><?php echo $user['created_at']; ?></td>

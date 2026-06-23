@@ -22,12 +22,11 @@ class User {
 
     public function create($data) {
        
-        $stmt = $this->db->prepare("INSERT INTO users (username, email, password, role, cef, nombre, cargo, grupo)
-        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO users (username, password, role, cef, nombre, cargo, grupo)
+        VALUES ( ?, ?, ?, ?, ?, ?, ?)");
     
         $stmt->execute([
             $data['username'],
-            $data['email'],
             password_hash($data['password'], PASSWORD_DEFAULT),
             $data['role'] ?? 'user',
             $data['cef'] ?? null,
@@ -45,10 +44,6 @@ class User {
             $fields[] = "username = ?";
             $values[] = $data['username'];
         }
-        if (isset($data['email'])) {
-            $fields[] = "email = ?";
-            $values[] = $data['email'];
-        }
         if (isset($data['password'])) {
             $fields[] = "password = ?";
             $values[] = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -56,6 +51,22 @@ class User {
         if (isset($data['role'])) {
             $fields[] = "role = ?";
             $values[] = $data['role'];
+        }
+        if (isset($data['cef'])) {
+            $fields[] = "cef = ?";
+            $values[] = $data['cef'];
+        }
+        if (isset($data['nombre'])) {
+            $fields[] = "nombre = ?";
+            $values[] = $data['nombre'];
+        }
+        if (isset($data['cargo'])) {
+            $fields[] = "cargo = ?";
+            $values[] = $data['cargo'];
+        }
+        if (isset($data['grupo'])) {
+            $fields[] = "grupo = ?";
+            $values[] = $data['grupo'];
         }
         $values[] = $id;
         $stmt = $this->db->prepare("UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?");
@@ -67,8 +78,28 @@ class User {
         return $stmt->execute([$id]);
     }
 
-    public function getAll() {
-        $stmt = $this->db->query("SELECT id, username, nombre, role, created_at FROM users ORDER BY created_at DESC");
+    public function getAll($filters = []) {
+        $sql = "SELECT id, username, cef, nombre, grupo, role, created_at FROM users";
+        $conditions = [];
+        $values = [];
+
+        if (!empty($filters['cedula'])) {
+            $conditions[] = "username LIKE ?";
+            $values[] = '%' . $filters['cedula'] . '%';
+        }
+
+        if (!empty($filters['cef'])) {
+            $conditions[] = "cef LIKE ?";
+            $values[] = '%' . $filters['cef'] . '%';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql .= ' ORDER BY created_at DESC';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($values);
         return $stmt->fetchAll();
     }
 }

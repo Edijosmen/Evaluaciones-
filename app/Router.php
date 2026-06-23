@@ -98,6 +98,13 @@ class Router {
             return;
         }
 
+        if (preg_match('/^evaluations\/(\d+)\/download$/', $uri, $matches)) {
+            $this->authController->requireAdmin();
+            $id = $matches[1];
+            $this->evaluationController->downloadResponses($id);
+            return;
+        }
+
         if ($uri === 'evaluations/create') {
             $this->authController->requireAdmin();
             $this->evaluationController->create();

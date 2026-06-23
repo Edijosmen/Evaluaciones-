@@ -20,8 +20,8 @@
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center">
-            <h1>Evaluations</h1>
-            <a href="evaluations/create" class="btn btn-primary">Create Evaluation</a>
+            <h1>Evaluciones</h1>
+            <a href="evaluations/create" class="btn btn-primary">Crear Evaluación</a>
         </div>
         <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
@@ -34,19 +34,17 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Actions</th>
+                        <th>Nombre</th>                      
+                        <th>Estado</th>
+                        <th>Fecha de Inicio</th>
+                        <th>Fecha de Fin</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($evaluations as $eval): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($eval['title']); ?></td>
-                            <td><?php echo htmlspecialchars(substr($eval['description'], 0, 50)); ?>...</td>
                             <td><?php echo ucfirst($eval['status']); ?></td>
                             <td><?php echo $eval['start_date']; ?></td>
                             <td><?php echo $eval['end_date']; ?></td>
@@ -54,6 +52,7 @@
                                 <a href="evaluations/<?php echo $eval['id']; ?>" class="btn btn-sm btn-info">View</a>
                                 <a href="evaluations/<?php echo $eval['id']; ?>/edit" class="btn btn-sm btn-warning">Edit</a>
                                 <a href="evaluations/<?php echo $eval['id']; ?>/assign" class="btn btn-sm btn-success">Assign</a>
+                                <a href="evaluations/<?php echo $eval['id']; ?>/download" class="btn btn-sm btn-secondary">Download CSV</a>
                                 <a href="evaluations/<?php echo $eval['id']; ?>/delete" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                             </td>
                         </tr>

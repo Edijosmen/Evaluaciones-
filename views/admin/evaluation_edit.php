@@ -9,7 +9,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="dashboard">Evaluation System - Admin</a>
+            <a class="navbar-brand" href="../../dashboard">Evaluation System - Admin</a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="users">Users</a>
                 <a class="nav-link" href="evaluations">Evaluations</a>

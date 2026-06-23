@@ -26,20 +26,24 @@
 
         <form method="POST" action="../../users/<?php echo $user['id']; ?>/edit">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
+                <label for="username" class="form-label">Username (Cédula)</label>
                 <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                <label for="cef" class="form-label">CEF</label>
+                <input type="text" class="form-control" id="cef" name="cef" value="<?php echo htmlspecialchars($user['cef'] ?? ''); ?>">
             </div>
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo htmlspecialchars($user['nombre']); ?>" required>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo htmlspecialchars($user['nombre'] ?? ''); ?>">
             </div>
-             <div class="mb-3">
+            <div class="mb-3">
                 <label for="cargo" class="form-label">Cargo</label>
-                <input type="text" class="form-control" id="cargo" name="cargo" value="<?php echo htmlspecialchars($user['cargo']); ?>" required>
+                <input type="text" class="form-control" id="cargo" name="cargo" value="<?php echo htmlspecialchars($user['cargo'] ?? ''); ?>">
+            </div>
+            <div class="mb-3">
+                <label for="grupo" class="form-label">Grupo</label>
+                <input type="text" class="form-control" id="grupo" name="grupo" value="<?php echo htmlspecialchars($user['grupo'] ?? ''); ?>">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password (leave blank to keep current)</label>

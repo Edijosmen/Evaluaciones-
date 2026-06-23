@@ -30,7 +30,7 @@ class Response {
 
     public function getForEvaluation($evaluationId) {
         $stmt = $this->db->prepare("
-            SELECT r.*, q.question_text, q.type, u.username
+            SELECT r.*, q.question_text, q.type, a.user_id, u.username, u.nombre AS full_name
             FROM responses r
             JOIN questions q ON r.question_id = q.id
             JOIN assignments a ON r.assignment_id = a.id

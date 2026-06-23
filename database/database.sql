@@ -31,6 +31,7 @@ CREATE TABLE questions (
     question_text TEXT NOT NULL,
     type ENUM('multiple_choice', 'scale', 'text') NOT NULL,
     options JSON NULL, -- For multiple choice options
+    note TEXT NULL, -- Additional information or notes about the question
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE
 );
